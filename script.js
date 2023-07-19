@@ -4,28 +4,21 @@ const gameChoices = {
     Scissors: "Scissors"
 };
 
-
-
 function getComputerChoice() {
     let randomNumber = Math.floor(Math.random() * 3);
     
     switch(randomNumber)
     {
         case 0:
-            return gameChoices.Rock;
+            return "Rock";
         case 1:
-            return gameChoices.Paper;
+            return "Paper";
         case 2:
-            return gameChoices.Scissors;
+            return "Scissors";
         default:
             console.error("Invalid random number");
     }
 }
-
-// for(let i = 0; i < 10; i++)
-// {
-//     console.log(getComputerChoice());
-// }
 
 // +----------+-------+-------+--------+
 // |          | Rock  | Paper |Scissors|
@@ -46,33 +39,59 @@ function playRound(playerSelection, computerSelection)
 
     point = winnerTable[computerSelectionIndex][playerSelectionIndex];
 
-    switch(point)
-    {
-        case 0:
-            return `It's a tie! Both chose ${playerSelection}.`;
-        case 1:
-            return `You won! ${playerSelection} beats ${computerSelection}.`;
-        case -1:
-            return `You lost! ${computerSelection} beats ${playerSelection}.`;
-        default:
-            console.error("Error in playRound() (invalid result)");
-    }
+    return point;
 }
 
 function convertSelectionToInt(selection) {
-    if(selection === gameChoices.Rock)
-        return 0;
-    else if(selection === gameChoices.Paper)
-        return 1;
-    else if(selection === gameChoices.Scissors)
-        return 2;
-    else
+    switch(selection)
     {
-        console.error("Error in convertSelectionToInt");
-        return -1;
+        case "Rock":
+            return 0;
+        case "Paper":
+            return 1;
+        case "Scissors":
+            return 2;
+        default:
+            console.error("Error in convertSelectionToInt");
+            return -1;
     }
 }
 
-const playerSelection = gameChoices.Rock;
-const computerSelection = getComputerChoice();
-console.log(playRound(playerSelection, computerSelection));
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function game() 
+{
+    let playerPoints = 0, computerPoints = 0;
+
+    for(let i = 0; i < 5; i++)
+    {
+        playerSelection = prompt("Choose Rock, Paper or Scissors.");
+        playerSelection = capitalizeFirstLetter(playerSelection);
+        computerSelection = getComputerChoice()
+
+        point = playRound(playerSelection, computerSelection);
+
+        switch(point)
+        {
+            case 0:
+                console.log(`It's a tie! Both chose ${playerSelection}.`);
+                break;
+            case 1:
+                console.log(`You won! ${playerSelection} beats ${computerSelection}.`);
+                playerPoints++;
+                break;
+            case -1:
+                console.log(`You lost! ${computerSelection} beats ${playerSelection}.`);
+                computerPoints++;
+                break;
+            default:
+                console.error("Error in playRound() (invalid result)");
+        }
+
+        console.log(`The score is ${playerPoints} - ${computerPoints}`);
+    }
+}
+
+game();
