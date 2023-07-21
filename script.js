@@ -1,9 +1,3 @@
-const gameChoices = {
-    Rock: "Rock",
-    Paper: "Paper",
-    Scissors: "Scissors"
-};
-
 function getComputerChoice() {
     let randomNumber = Math.floor(Math.random() * 3);
     
@@ -61,37 +55,90 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function game() 
-{
-    let playerPoints = 0, computerPoints = 0;
-
-    for(let i = 0; i < 5; i++)
+function changeScore(point, roundText) {
+    switch(point)
     {
-        playerSelection = prompt("Choose Rock, Paper or Scissors.");
-        playerSelection = capitalizeFirstLetter(playerSelection);
-        computerSelection = getComputerChoice()
-
-        point = playRound(playerSelection, computerSelection);
-
-        switch(point)
-        {
-            case 0:
-                console.log(`It's a tie! Both chose ${playerSelection}.`);
-                break;
-            case 1:
-                console.log(`You won! ${playerSelection} beats ${computerSelection}.`);
-                playerPoints++;
-                break;
-            case -1:
-                console.log(`You lost! ${computerSelection} beats ${playerSelection}.`);
-                computerPoints++;
-                break;
-            default:
-                console.error("Error in playRound() (invalid result)");
-        }
-
-        console.log(`The score is ${playerPoints} - ${computerPoints}`);
+        case 0:
+            roundText.textContent = `It's a tie! Both chose ${playerSelection}.`;
+            break;
+        case 1:
+            roundText.textContent = `You won! ${playerSelection} beats ${computerSelection}.`;
+            playerPoints++;
+            break;
+        case -1:
+            roundText.textContent = `You lost! ${computerSelection} beats ${playerSelection}.`;
+            computerPoints++;
+            break;
+        default:
+            console.error("Error in playRound() (invalid result)");
     }
 }
 
+function endGame(parent, scoreText, roundText) {
+    const divGameOver = document.createElement("div");
+    const buttonPlayAgain = document.createElement("button");
+    buttonPlayAgain.textContent = "Play again";
+
+    if(playerPoints > computerPoints)
+    {
+        divGameOver.style.color = "blue";
+        divGameOver.textContent = `You won against the computer!! Wanna play again?`;
+    }
+    else
+    {
+        divGameOver.style.color = "red";
+        divGameOver.textContent = `The computer emerged victorious.. Wanna play again?`;
+    }
+
+    parent.appendChild(divGameOver);
+    parent.appendChild(buttonPlayAgain);
+
+    buttonPlayAgain.addEventListener("click", () => {
+        playerPoints = 0;
+        computerPoints = 0;
+
+        parent.removeChild(divGameOver);
+        parent.removeChild(buttonPlayAgain);
+        gameOver = false;
+
+        scoreText.textContent = `The score is: ${playerPoints} - ${computerPoints}`;
+        roundText.textContent = "";
+    })
+}
+
+function game() 
+{
+    const scoreText = document.createElement("div");
+    const roundText = document.createElement("div");
+    const body = document.querySelector("body");
+    scoreText.textContent = `The score is: ${playerPoints} - ${computerPoints}`;
+    body.appendChild(scoreText);
+    body.appendChild(roundText);
+
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+            if(gameOver)
+                return;
+            
+            computerSelection = getComputerChoice();
+            playerSelection = e.target.id;
+            let point = playRound(playerSelection, computerSelection);
+
+            changeScore(point, roundText);
+        
+            scoreText.textContent = `The score is: ${playerPoints} - ${computerPoints}`;
+            console.log(`The score is ${playerPoints} - ${computerPoints}`);
+
+            if(playerPoints >= 5 || computerPoints >= 5)
+            { 
+                gameOver = true;
+                endGame(body, scoreText, roundText)
+            }
+        })
+    });
+}
+
+gameOver = false;
+let playerPoints = 0, computerPoints = 0;
 game();
